@@ -1,7 +1,10 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { OverdueItem } from '../../models/toolshare.models';
+import { DashboardService } from '../../core/services/dashboard.service';
+import { ToolsService } from '../../core/services/tools.service';
 
 interface CatalogSummary {
   total: number;
@@ -17,21 +20,45 @@ interface CatalogSummary {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {
-  // Loading/error flags let downstream wiring flip real request state.
+export class DashboardComponent implements OnInit {
+  private dashboardApi = inject(DashboardService);
+  private toolsApi = inject(ToolsService);
+
+  // Loading/error flags reflect real request state.
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  // Backend-provided data — declared as signals per the mockup data contract.
-  readonly summary = signal<CatalogSummary>({ total: 6, available: 3, onLoan: 2, reserved: 1 });
+  // Live data — the catalog summary is derived from the tools list; there is no
+  // dedicated summary endpoint.
+  readonly summary = signal<CatalogSummary>({ total: 0, available: 0, onLoan: 0, reserved: 0 });
 
-  readonly overdue = signal<OverdueItem[]>([
-    { id: 'o1', toolName: 'Cordless Drill', borrowerName: 'Maria Gonzalez', dueDate: '2026-07-09', daysOverdue: 8 },
-    { id: 'o2', toolName: 'Extension Ladder', borrowerName: 'Sam Okafor', dueDate: '2026-07-12', daysOverdue: 5 },
-    { id: 'o3', toolName: 'Circular Saw', borrowerName: 'Dana Whitfield', dueDate: '2026-07-15', daysOverdue: 2 },
-  ]);
+  readonly overdue = signal<OverdueItem[]>([]);
 
   readonly hasOverdue = computed(() => this.overdue().length > 0);
+
+  ngOnInit(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    forkJoin({
+      overdue: this.dashboardApi.overdue(),
+      tools: this.toolsApi.list(),
+    }).subscribe({
+      next: ({ overdue, tools }) => {
+        this.overdue.set(overdue);
+        this.summary.set({
+          total: tools.length,
+          available: tools.filter((t) => t.availability === 'available').length,
+          onLoan: tools.filter((t) => t.availability === 'on_loan').length,
+          reserved: tools.filter((t) => t.availability === 'reserved').length,
+        });
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message ?? 'Failed to load the dashboard.');
+        this.loading.set(false);
+      },
+    });
+  }
 
   readonly tiles = computed(() => {
     const s = this.summary();

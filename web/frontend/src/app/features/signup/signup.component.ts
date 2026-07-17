@@ -42,9 +42,18 @@ export class SignupComponent {
     if (this.signupForm.invalid) return;
     this.loading = true;
     this.errorMessage = '';
-    const { email, password } = this.signupForm.value;
-    this.auth.signup(email, password);
-    this.router.navigate(['/dashboard']);
+    const { name, email, password } = this.signupForm.value;
+    this.auth.signup(email, password, name).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage =
+          err?.error?.message ?? 'Could not create your account. Please try again.';
+      },
+    });
   }
 
   demoLogin(): void {

@@ -1,12 +1,12 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../core/services/auth.service';
+import { LoansService } from '../../core/services/loans.service';
+import { ToolsService } from '../../core/services/tools.service';
 import { Loan, LoanStatus } from '../../models/toolshare.models';
-
-const TODAY = '2026-07-17';
 
 interface LoanRow extends Loan {
   status: LoanStatus;
@@ -20,11 +20,13 @@ interface LoanRow extends Loan {
   templateUrl: './loans.component.html',
   styleUrl: './loans.component.css',
 })
-export class LoansComponent {
+export class LoansComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
+  private loansApi = inject(LoansService);
+  private toolsApi = inject(ToolsService);
 
   readonly isAdmin = this.auth.isAdmin;
   readonly loading = signal(false);
@@ -37,28 +39,46 @@ export class LoansComponent {
     { key: 'returned', label: 'Returned' },
   ];
 
-  // Backend-provided data — signal per the mockup data contract.
-  readonly loans = signal<Loan[]>([
-    { id: 'l1', toolId: 't2', toolName: 'Circular Saw', borrowerName: 'Maria Gonzalez', dueDate: '2026-07-09', returnedAt: null, createdAt: '2026-06-25' },
-    { id: 'l2', toolId: 't6', toolName: 'Extension Ladder', borrowerName: 'Sam Okafor', dueDate: '2026-07-24', returnedAt: null, createdAt: '2026-07-10' },
-    { id: 'l3', toolId: 't1', toolName: 'Cordless Drill', borrowerName: 'Dana Whitfield', dueDate: '2026-07-15', returnedAt: null, createdAt: '2026-07-01' },
-    { id: 'l4', toolId: 't3', toolName: 'Claw Hammer', borrowerName: 'Leah Kim', dueDate: '2026-07-05', returnedAt: '2026-07-04', createdAt: '2026-06-20' },
-  ]);
+  // Live loan data, loaded from GET /api/v1/loans.
+  readonly loans = signal<Loan[]>([]);
 
-  // Tools eligible to loan out — used by the new-loan form.
-  readonly loanableTools = signal<{ id: string; name: string }[]>([
-    { id: 't1', name: 'Cordless Drill' },
-    { id: 't3', name: 'Claw Hammer' },
-    { id: 't5', name: 'Laser Measure' },
-  ]);
+  // Tools eligible to loan out (available) — used by the new-loan form.
+  readonly loanableTools = signal<{ id: string; name: string }[]>([]);
 
   private params = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
   readonly status = computed(() => this.params().get('status') ?? '');
   readonly modal = computed(() => this.params().get('modal'));
 
+  ngOnInit(): void {
+    this.loadLoans();
+    this.loadLoanableTools();
+  }
+
+  private loadLoans(): void {
+    this.loading.set(true);
+    this.error.set(null);
+    this.loansApi.list().subscribe({
+      next: (loans) => {
+        this.loans.set(loans);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.error.set(err?.error?.message ?? 'Failed to load loans.');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  private loadLoanableTools(): void {
+    this.toolsApi.list({ status: 'available' }).subscribe({
+      next: (tools) => this.loanableTools.set(tools.map((t) => ({ id: t.id, name: t.name }))),
+      error: () => this.loanableTools.set([]),
+    });
+  }
+
   private daysBetween(due: string): number {
     const d = Date.parse(due);
-    const t = Date.parse(TODAY);
+    const t = Date.now();
     return Math.floor((t - d) / 86_400_000);
   }
 
@@ -105,21 +125,29 @@ export class LoansComponent {
   createLoan(): void {
     if (this.loanForm.invalid) return;
     const v = this.loanForm.value as { toolId: string; borrowerName: string; dueDate: string };
-    const tool = this.loanableTools().find((t) => t.id === v.toolId);
-    const loan: Loan = {
-      id: 'l' + (this.loans().length + 1) + '-new',
-      toolId: v.toolId,
-      toolName: tool?.name ?? 'Tool',
-      borrowerName: v.borrowerName,
-      dueDate: v.dueDate,
-      returnedAt: null,
-      createdAt: TODAY,
-    };
-    this.loans.update((list) => [loan, ...list]);
-    this.closeModal();
+    this.loansApi
+      .create({
+        toolId: v.toolId,
+        borrowerName: v.borrowerName,
+        dueDate: new Date(v.dueDate).toISOString(),
+      })
+      .subscribe({
+        next: () => {
+          this.loadLoans();
+          this.loadLoanableTools();
+          this.closeModal();
+        },
+        error: (err) => this.error.set(err?.error?.message ?? 'Failed to create the loan.'),
+      });
   }
 
   returnLoan(row: LoanRow): void {
-    this.loans.update((list) => list.map((l) => (l.id === row.id ? { ...l, returnedAt: TODAY } : l)));
+    this.loansApi.returnLoan(row.id).subscribe({
+      next: () => {
+        this.loadLoans();
+        this.loadLoanableTools();
+      },
+      error: (err) => this.error.set(err?.error?.message ?? 'Failed to return the loan.'),
+    });
   }
 }

@@ -32,8 +32,17 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
     const { email, password } = this.loginForm.value;
-    this.auth.login(email, password);
-    this.router.navigate(['/dashboard']);
+    this.auth.login(email, password).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage =
+          err?.error?.message ?? 'Invalid email or password. Please try again.';
+      },
+    });
   }
 
   demoLogin(): void {
