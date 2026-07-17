@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toolshare-lib
+  namespace: colossus-toolshare-lib
+  labels:
+    app: toolshare-lib
+    managed-by: colossus
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: toolshare-lib
+  template:
+    metadata:
+      labels:
+        app: toolshare-lib
+    spec:
+      hostAliases:
+        - ip: "192.168.50.250"
+          hostnames:
+            - "ubuntu.desmana-truck.ts.net"
+      containers:
+        - name: app
+          image: ubuntu:30500/toolshare-lib:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: app-secrets
+                optional: true
