@@ -9,6 +9,15 @@ import { CreateLoanDto } from './dto/create-loan.dto';
 import { ListLoansDto } from './dto/list-loans.dto';
 import { loanStatus } from '../common/availability';
 
+/** True when a Prisma error is a unique-constraint (P2002) violation. */
+function isUniqueViolation(err: unknown): boolean {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    (err as { code?: string }).code === 'P2002'
+  );
+}
+
 type LoanWithTool = {
   id: string;
   toolId: string;
@@ -77,16 +86,25 @@ export class LoansService {
       throw new ConflictException('Tool already has an open loan');
     }
 
-    const loan = await this.prisma.loan.create({
-      data: {
-        toolId: dto.toolId,
-        borrowerName: dto.borrowerName,
-        borrowerUserId: dto.borrowerUserId ?? null,
-        dueDate: new Date(dto.dueDate),
-      },
-      include: { tool: { select: { name: true } } },
-    });
-    return this.shape(loan as LoanWithTool);
+    try {
+      const loan = await this.prisma.loan.create({
+        data: {
+          toolId: dto.toolId,
+          borrowerName: dto.borrowerName,
+          borrowerUserId: dto.borrowerUserId ?? null,
+          dueDate: new Date(dto.dueDate),
+        },
+        include: { tool: { select: { name: true } } },
+      });
+      return this.shape(loan as LoanWithTool);
+    } catch (err) {
+      // Backstop for the DB-level partial unique index (one open loan per tool)
+      // when two requests race past the app-level check above.
+      if (isUniqueViolation(err)) {
+        throw new ConflictException('Tool already has an open loan');
+      }
+      throw err;
+    }
   }
 
   /**

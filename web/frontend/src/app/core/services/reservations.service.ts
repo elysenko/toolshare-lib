@@ -17,4 +17,8 @@ export class ReservationsService {
   create(toolId: string): Observable<Reservation> {
     return this.http.post<Reservation>(this.base, { toolId });
   }
+
+  cancel(id: string): Observable<Reservation> {
+    return this.http.patch<Reservation>(`${this.base}/${id}/cancel`, {});
+  }
 }

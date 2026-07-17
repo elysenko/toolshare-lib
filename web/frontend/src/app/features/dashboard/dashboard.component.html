@@ -19,8 +19,8 @@
   <div class="overdue-block card">
     <div class="block-head">
       <div>
-        <h2 class="block-title">Overdue Watchlist <span class="badge overdue">{{ overdue().length }}</span></h2>
-        <p class="block-sub">Unreturned loans past their due date.</p>
+        <h2 class="block-title">Overdue <span class="badge overdue">{{ overdue().length }}</span></h2>
+        <p class="block-sub">Watchlist — unreturned loans past their due date.</p>
       </div>
       <a class="btn btn-ghost btn-sm" routerLink="/loans" [queryParams]="{ status: 'overdue' }">View in Loans</a>
     </div>

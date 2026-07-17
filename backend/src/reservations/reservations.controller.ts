@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Role } from '@generated/prisma/client';
 import { Auth, GetUser } from 'src/auth/decorators';
@@ -16,8 +16,8 @@ export class ReservationsController {
   @ApiOperation({ summary: 'LIST RESERVATIONS', description: 'Authenticated. FIFO-ordered with computed position.' })
   @ApiResponse({ status: 200, description: 'Ok' })
   @Auth(Role.admin, Role.user)
-  findAll() {
-    return this.reservationsService.findAll();
+  findAll(@GetUser() user: User) {
+    return this.reservationsService.findAll({ id: user.id, role: user.role });
   }
 
   @Post()
@@ -26,5 +26,13 @@ export class ReservationsController {
   @Auth(Role.admin, Role.user)
   create(@GetUser() user: User, @Body() dto: CreateReservationDto) {
     return this.reservationsService.create(user.id, dto);
+  }
+
+  @Patch(':id/cancel')
+  @ApiOperation({ summary: 'CANCEL RESERVATION', description: 'Owner or admin cancels an active reservation.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @Auth(Role.admin, Role.user)
+  cancel(@GetUser() user: User, @Param('id') id: string) {
+    return this.reservationsService.cancel({ id: user.id, role: user.role }, id);
   }
 }

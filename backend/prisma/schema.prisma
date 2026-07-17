@@ -86,6 +86,9 @@ model Loan {
 
   @@index([toolId])
   @@index([returnedAt])
+  // Partial unique index (one open loan per tool) added via raw SQL in
+  // migration 20260718000000_reservation_loan_uniqueness — Prisma cannot model
+  // `WHERE "returnedAt" IS NULL` in schema.
 }
 
 model Reservation {
@@ -102,6 +105,9 @@ model Reservation {
   @@index([toolId])
   @@index([userId])
   @@index([status])
+  // Partial unique index (one ACTIVE reservation per user per tool) added via
+  // raw SQL in migration 20260718000000_reservation_loan_uniqueness — Prisma
+  // cannot model `WHERE "status" = 'ACTIVE'` in schema.
 }
 
 // Key/value store for admin-editable service settings (masked in the API).

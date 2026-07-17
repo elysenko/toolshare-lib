@@ -95,11 +95,13 @@ export class ReservationsComponent implements OnInit {
     });
   }
 
-  // NOTE: the backend exposes no cancel/DELETE endpoint for reservations, so this
-  // remains an optimistic client-side update (does not persist server-side).
+  // Cancels the reservation server-side (PATCH /reservations/:id/cancel), then
+  // reloads the list so the FIFO queue and positions reflect the change.
   cancel(reservation: Reservation): void {
-    this.reservations.update((list) =>
-      list.map((r) => (r.id === reservation.id ? { ...r, status: 'CANCELLED' } : r)),
-    );
+    this.error.set(null);
+    this.reservationsApi.cancel(reservation.id).subscribe({
+      next: () => this.loadReservations(),
+      error: (err) => this.error.set(err?.error?.message ?? 'Failed to cancel the reservation.'),
+    });
   }
 }
