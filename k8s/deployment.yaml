@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: toolshare-lib
-  namespace: colossus-toolshare-lib
+  name: toolshare-lib-staging
+  namespace: colossus-toolshare-lib-staging
   labels:
-    app: toolshare-lib
+    app: toolshare-lib-staging
     managed-by: colossus
 spec:
   replicas: 1
@@ -12,11 +12,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: toolshare-lib
+      app: toolshare-lib-staging
   template:
     metadata:
       labels:
-        app: toolshare-lib
+        app: toolshare-lib-staging
     spec:
       hostAliases:
         - ip: "192.168.50.250"
@@ -24,7 +24,7 @@ spec:
             - "ubuntu.desmana-truck.ts.net"
       containers:
         - name: app
-          image: ubuntu:30500/toolshare-lib:latest
+          image: ubuntu:30500/toolshare-lib-staging:latest
           imagePullPolicy: Always
           envFrom:
             - secretRef:

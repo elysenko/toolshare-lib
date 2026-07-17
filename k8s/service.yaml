@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: toolshare-lib
-  namespace: colossus-toolshare-lib
+  name: toolshare-lib-staging
+  namespace: colossus-toolshare-lib-staging
   labels:
-    app: toolshare-lib
+    app: toolshare-lib-staging
     managed-by: colossus
 spec:
   type: ClusterIP
   selector:
-    app: toolshare-lib
+    app: toolshare-lib-staging
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 80

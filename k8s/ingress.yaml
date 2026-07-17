@@ -1,10 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: toolshare-lib
-  namespace: colossus-toolshare-lib
+  name: toolshare-lib-staging
+  namespace: colossus-toolshare-lib-staging
   labels:
-    app: toolshare-lib
+    app: toolshare-lib-staging
     managed-by: colossus
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -15,11 +15,11 @@ spec:
     - host: ubuntu.desmana-truck.ts.net
       http:
         paths:
-          - path: /toolshare-lib(/|$)(.*)
+          - path: /toolshare-lib-staging(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
-                name: toolshare-lib
+                name: toolshare-lib-staging
                 port:
                   number: 80
   tls:

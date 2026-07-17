@@ -1,12 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: colossus-toolshare-lib
+namespace: colossus-toolshare-lib-staging
 resources:
   - k8s/deployment.yaml
   - k8s/service.yaml
   - k8s/ingress.yaml
 images:
-  - name: ubuntu:30500/toolshare-lib
-    digest: sha256:58baca07148604a84a679f0c0ad9d9c1846056e3a91c8655bfab59a3ec58df48
+  - name: ubuntu:30500/toolshare-lib-staging
+    digest: ubuntu:30500/toolshare-lib-staging@sha256:2ac08eb5aa297be17f914061bf74246c8bf2c77fe11057bc9ac41e905d90e095
 # Redeploy:  kubectl apply -k . (re-applies this exact image)
 # Rebuild:   re-trigger the deploy pipeline for branch main in Colossus
