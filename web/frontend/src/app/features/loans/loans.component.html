@@ -1,0 +1,90 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Loans</h1>
+      <p class="page-subtitle">Track who has borrowed what and when it’s due.</p>
+    </div>
+    @if (isAdmin()) {
+      <button type="button" class="btn btn-primary" (click)="openNew()">+ New loan</button>
+    }
+  </div>
+
+  <div class="segmented" role="tablist" aria-label="Filter loans by status">
+    @for (s of statuses; track s.key) {
+      <button
+        type="button"
+        class="seg-btn"
+        [class.active]="status() === s.key"
+        (click)="setStatus(s.key)"
+      >{{ s.label }}</button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="state"><div class="state-icon">⏳</div><div class="state-title">Loading loans…</div></div>
+  } @else if (error()) {
+    <div class="state error"><div class="state-icon">⚠️</div><div class="state-title">Couldn’t load loans</div><p>{{ error() }}</p></div>
+  } @else if (rows().length === 0) {
+    <div class="state"><div class="state-icon">📄</div><div class="state-title">No loans here</div><p>Nothing matches this filter yet.</p></div>
+  } @else {
+    <div class="loan-list">
+      @for (row of rows(); track row.id) {
+        <article class="loan-row card">
+          <div class="loan-main">
+            <span class="loan-tool">{{ row.toolName }}</span>
+            <span class="loan-borrower">{{ row.borrowerName }}</span>
+          </div>
+          <div class="loan-mid">
+            <span class="loan-due">Due {{ row.dueDate }}</span>
+            @if (row.status === 'returned' && row.returnedAt) {
+              <span class="loan-returned">Returned {{ row.returnedAt }}</span>
+            }
+          </div>
+          <div class="loan-end">
+            <span class="badge" [ngClass]="row.status">
+              {{ row.status === 'overdue' ? (row.daysOverdue + 'd overdue') : (row.status | titlecase) }}
+            </span>
+            @if (isAdmin() && row.status !== 'returned') {
+              <button type="button" class="btn btn-ghost btn-sm" (click)="returnLoan(row)">Mark returned</button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
+
+<!-- New loan modal (?modal=new-loan) -->
+@if (modal() === 'new-loan') {
+  <div class="overlay" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h2 class="modal-title">New loan</h2>
+        <button type="button" class="modal-close" (click)="closeModal()" aria-label="Close">×</button>
+      </div>
+      <form [formGroup]="loanForm" (ngSubmit)="createLoan()">
+        <div class="modal-body">
+          <div class="field">
+            <label class="field-label" for="loan-tool">Tool</label>
+            <select id="loan-tool" class="select" formControlName="toolId">
+              <option value="" disabled>Select a tool…</option>
+              @for (t of loanableTools(); track t.id) { <option [value]="t.id">{{ t.name }}</option> }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="loan-borrower">Borrower name</label>
+            <input id="loan-borrower" class="input" type="text" formControlName="borrowerName" placeholder="e.g. Maria Gonzalez" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="loan-due">Due date</label>
+            <input id="loan-due" class="input" type="date" formControlName="dueDate" />
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loanForm.invalid">Create loan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

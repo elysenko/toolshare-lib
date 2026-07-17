@@ -1,0 +1,51 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Overview of your community tool library.</p>
+    </div>
+    <a class="btn btn-ghost" routerLink="/tools">Browse catalog</a>
+  </div>
+
+  <div class="tiles">
+    @for (tile of tiles(); track tile.key) {
+      <div class="tile card card-pad">
+        <span class="tile-value" [attr.data-tone]="tile.tone">{{ tile.value }}</span>
+        <span class="tile-label">{{ tile.label }}</span>
+      </div>
+    }
+  </div>
+
+  <div class="overdue-block card">
+    <div class="block-head">
+      <div>
+        <h2 class="block-title">Overdue Watchlist <span class="badge overdue">{{ overdue().length }}</span></h2>
+        <p class="block-sub">Unreturned loans past their due date.</p>
+      </div>
+      <a class="btn btn-ghost btn-sm" routerLink="/loans" [queryParams]="{ status: 'overdue' }">View in Loans</a>
+    </div>
+
+    @if (loading()) {
+      <div class="state"><div class="state-icon">⏳</div><div class="state-title">Loading overdue loans…</div></div>
+    } @else if (error()) {
+      <div class="state error"><div class="state-icon">⚠️</div><div class="state-title">Couldn’t load overdue loans</div><p>{{ error() }}</p></div>
+    } @else if (!hasOverdue()) {
+      <div class="state"><div class="state-icon">✅</div><div class="state-title">Nothing overdue</div><p>Every loaned tool is on time. Nice work.</p></div>
+    } @else {
+      <ul class="overdue-list">
+        @for (item of overdue(); track item.id) {
+          <li class="overdue-row">
+            <div class="ov-main">
+              <span class="ov-tool">{{ item.toolName }}</span>
+              <span class="ov-borrower">Borrowed by {{ item.borrowerName }}</span>
+            </div>
+            <div class="ov-meta">
+              <span class="ov-due">Due {{ item.dueDate }}</span>
+              <span class="badge overdue">{{ item.daysOverdue }} day{{ item.daysOverdue === 1 ? '' : 's' }} overdue</span>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</section>

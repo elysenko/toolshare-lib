@@ -1,0 +1,35 @@
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.tile { display: flex; flex-direction: column; gap: var(--space-1); }
+.tile-value { font-size: var(--text-2xl); font-weight: 800; letter-spacing: -0.02em; }
+.tile-value[data-tone="available"] { color: var(--color-available); }
+.tile-value[data-tone="on_loan"] { color: var(--color-on-loan); }
+.tile-value[data-tone="reserved"] { color: var(--color-reserved); }
+.tile-label { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 600; }
+
+.block-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-4); border-bottom: 1px solid var(--color-border); flex-wrap: wrap;
+}
+.block-title { font-size: var(--text-lg); display: flex; align-items: center; gap: var(--space-2); }
+.block-sub { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-1); }
+
+.overdue-list { list-style: none; margin: 0; padding: 0; }
+.overdue-row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-4); border-bottom: 1px solid var(--color-border); flex-wrap: wrap;
+}
+.overdue-row:last-child { border-bottom: none; }
+.ov-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ov-tool { font-weight: 700; }
+.ov-borrower { font-size: var(--text-sm); color: var(--color-text-muted); }
+.ov-meta { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.ov-due { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+@media (max-width: 768px) {
+  .ov-meta { width: 100%; justify-content: space-between; }
+}

@@ -1,0 +1,49 @@
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">🛠️</span>
+      <span class="brand-name">ToolShare</span>
+    </div>
+    <div class="topbar-right">
+      @if (user()) {
+        <div class="user-chip">
+          <span class="user-email">{{ user()!.email }}</span>
+          <span class="role-badge" [class.admin]="user()!.role === 'ADMIN'">{{ user()!.role }}</span>
+        </div>
+      }
+      <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <nav class="sidebar" aria-label="Main navigation">
+      @for (item of navItems(); track item.path) {
+        <a
+          class="nav-link"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+        >
+          <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+
+  <nav class="tabbar" aria-label="Mobile navigation">
+    @for (item of navItems(); track item.path) {
+      <a
+        class="tab-link"
+        [routerLink]="item.path"
+        routerLinkActive="active"
+      >
+        <span class="tab-icon" aria-hidden="true">{{ item.icon }}</span>
+        <span class="tab-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>

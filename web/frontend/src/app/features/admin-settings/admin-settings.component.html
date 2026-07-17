@@ -1,0 +1,58 @@
+<section class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Settings</h1>
+      <p class="page-subtitle">Configure service credentials for ToolShare.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="state"><div class="state-icon">⏳</div><div class="state-title">Loading settings…</div></div>
+  } @else if (error()) {
+    <div class="state error"><div class="state-icon">⚠️</div><div class="state-title">Couldn’t load settings</div><p>{{ error() }}</p></div>
+  } @else {
+    <div class="service-list">
+      @for (service of services(); track service.key) {
+        <article class="service-card card">
+          <div class="service-head">
+            <div>
+              <h2 class="service-name">{{ service.label }}</h2>
+              <p class="service-desc">{{ service.description }}</p>
+            </div>
+            <span class="badge" [ngClass]="service.configured ? 'available' : 'overdue'">
+              {{ service.configured ? 'Configured' : 'Not configured' }}
+            </span>
+          </div>
+
+          @if (service.configured && service.maskedValue) {
+            <p class="service-current">Current: <code>{{ service.maskedValue }}</code></p>
+          }
+
+          <form (ngSubmit)="save(service)" class="service-form">
+            <div class="service-fields">
+              @for (field of service.fields; track field.name) {
+                <div class="field">
+                  <label class="field-label" [attr.for]="service.key + '-' + field.name">{{ field.label }}</label>
+                  <input
+                    [id]="service.key + '-' + field.name"
+                    class="input"
+                    [type]="field.type"
+                    [placeholder]="field.placeholder"
+                    [(ngModel)]="drafts[service.key][field.name]"
+                    [name]="service.key + '-' + field.name"
+                  />
+                </div>
+              }
+            </div>
+            <div class="service-actions">
+              @if (savedKey() === service.key) {
+                <span class="save-note">✓ Saved</span>
+              }
+              <button type="submit" class="btn btn-primary">Save {{ service.label }}</button>
+            </div>
+          </form>
+        </article>
+      }
+    </div>
+  }
+</section>

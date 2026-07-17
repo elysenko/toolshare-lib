@@ -1,0 +1,39 @@
+.auth-wrap {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background:
+    radial-gradient(1100px 480px at 15% -10%, var(--color-primary-soft), transparent 60%),
+    var(--color-bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-6);
+}
+
+.auth-brand { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); }
+.auth-mark { font-size: 26px; }
+.auth-name { font-size: var(--text-xl); font-weight: 800; color: var(--color-primary); letter-spacing: -0.02em; }
+
+.auth-title { font-size: var(--text-2xl); letter-spacing: -0.02em; }
+.auth-sub { color: var(--color-text-muted); font-size: var(--text-sm); margin: var(--space-2) 0 var(--space-5); }
+
+.auth-form-error {
+  background: var(--color-overdue-soft); color: var(--color-danger);
+  padding: var(--space-3); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-weight: 600;
+}
+
+.auth-alt { text-align: center; font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-4); }
+.auth-alt a { color: var(--color-primary); font-weight: 700; }
+
+.demo-btn {
+  display: block; width: 100%; margin-top: var(--space-5);
+  min-height: 44px; border: 1px dashed var(--color-border-strong); border-radius: var(--radius-md);
+  background: transparent; color: var(--color-text-muted); font-size: var(--text-sm); font-weight: 600;
+}
+.demo-btn:active { background: var(--color-surface-alt); }

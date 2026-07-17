@@ -1,0 +1,60 @@
+<div class="auth-wrap">
+  <div class="auth-card card">
+    <div class="auth-brand">
+      <span class="auth-mark">🛠️</span>
+      <span class="auth-name">ToolShare</span>
+    </div>
+    <h1 class="auth-title">Create your account</h1>
+    <p class="auth-sub">Join your community tool library. The first member becomes the admin.</p>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label class="field-label" for="name">Full name</label>
+        <input id="name" class="input" type="text" formControlName="name" placeholder="Jordan Rivera" autocomplete="name" />
+        @if (signupForm.get('name')?.invalid && signupForm.get('name')?.touched) {
+          <span class="field-error">Name is required</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <input id="email" class="input" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" />
+        @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
+          <span class="field-error">Enter a valid email address</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <input id="password" class="input" type="password" formControlName="password" placeholder="At least 6 characters" autocomplete="new-password" />
+        @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
+          <span class="field-error">Password must be at least 6 characters</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" class="input" type="password" formControlName="confirmPassword" placeholder="Re-enter password" autocomplete="new-password" />
+        @if (signupForm.errors?.['mismatch'] && signupForm.get('confirmPassword')?.touched) {
+          <span class="field-error">Passwords do not match</span>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="field-error auth-form-error">{{ errorMessage }}</div>
+      }
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="signupForm.invalid || loading">
+        {{ loading ? 'Creating account…' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="auth-alt">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+
+    <button type="button" class="demo-btn" (click)="demoLogin()">
+      Skip signup — explore in Demo Mode →
+    </button>
+  </div>
+</div>

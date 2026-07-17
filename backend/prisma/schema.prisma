@@ -31,5 +31,75 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   //Relations and Indexes
- 
+  loans         Loan[]        @relation("BorrowerLoans")
+  reservations  Reservation[]
+}
+
+// ── ToolShare domain ──────────────────────────────────────────────────────────
+
+enum ToolCategory {
+  Power
+  Hand
+  Garden
+  Measurement
+}
+
+enum ToolCondition {
+  New
+  Good
+  Fair
+  Worn
+}
+
+enum ReservationStatus {
+  ACTIVE
+  FULFILLED
+  CANCELLED
+}
+
+model Tool {
+  id           String        @id @default(uuid())
+  name         String
+  category     ToolCategory
+  condition    ToolCondition
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  //Relations and Indexes
+  loans        Loan[]
+  reservations Reservation[]
+
+  @@index([category])
+}
+
+model Loan {
+  id             String    @id @default(uuid())
+  toolId         String
+  borrowerName   String
+  borrowerUserId String?
+  dueDate        DateTime
+  returnedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  //Relations and Indexes
+  tool           Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  borrower       User?     @relation("BorrowerLoans", fields: [borrowerUserId], references: [id], onDelete: SetNull)
+
+  @@index([toolId])
+  @@index([returnedAt])
+}
+
+model Reservation {
+  id        String            @id @default(uuid())
+  toolId    String
+  userId    String
+  status    ReservationStatus @default(ACTIVE)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  //Relations and Indexes
+  tool      Tool              @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([toolId])
+  @@index([userId])
+  @@index([status])
 }

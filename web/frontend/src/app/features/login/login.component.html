@@ -1,0 +1,44 @@
+<div class="auth-wrap">
+  <div class="auth-card card">
+    <div class="auth-brand">
+      <span class="auth-mark">🛠️</span>
+      <span class="auth-name">ToolShare</span>
+    </div>
+    <h1 class="auth-title">Welcome back</h1>
+    <p class="auth-sub">Sign in to browse tools, manage loans and reservations.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <input id="email" class="input" type="email" formControlName="email" placeholder="you@example.com" autocomplete="email" />
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <span class="field-error">Enter a valid email address</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <input id="password" class="input" type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <span class="field-error">Password is required</span>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="field-error auth-form-error">{{ errorMessage }}</div>
+      }
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="loginForm.invalid || loading">
+        {{ loading ? 'Signing in…' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p class="auth-alt">
+      New to ToolShare? <a routerLink="/signup">Create an account</a>
+    </p>
+
+    <button type="button" class="demo-btn" (click)="demoLogin()">
+      Skip login — explore in Demo Mode →
+    </button>
+  </div>
+</div>
