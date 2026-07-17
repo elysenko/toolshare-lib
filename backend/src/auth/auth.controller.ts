@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, HttpStatus, HttpCode } from '@nestjs/common';
 
 import { RegisterUserDto } from './dto/register-user.dto';
+import { SignupUserDto } from './dto/signup-user.dto';
 import { AuthService } from './auth.service';
 import { LoginResponse } from './interfaces';
 import { Auth, GetUser } from './decorators';
@@ -26,6 +27,19 @@ export class AuthController {
     return this.authService.registerUser(createUserDto);
   }
 
+  @Post('signup')
+  @ApiOperation({
+    summary: 'SIGNUP',
+    description:
+      'Public endpoint to sign up. The first account on an empty user table becomes ADMIN; every subsequent account is a USER.',
+  })
+  @ApiResponse({ status: 201, description: 'Ok', type: LoginResponse })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  signup(@Body() signupUserDto: SignupUserDto) {
+    return this.authService.signupUser(signupUserDto);
+  }
+
   @Post('login')
   @ApiOperation({
     summary: 'LOGIN',
@@ -37,6 +51,34 @@ export class AuthController {
   async login(@Res() response, @Body() loginUserDto: LoginUserDto) {
     const data = await this.authService.loginUser(loginUserDto.email, loginUserDto.password);
     response.status(HttpStatus.OK).send(data);
+  }
+
+  @Get('me')
+  @ApiOperation({
+    summary: 'ME',
+    description: 'Private endpoint returning the currently authenticated user.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Ok', type: User })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Auth()
+  me(@GetUser() user: User) {
+    return user;
+  }
+
+  @Post('logout')
+  @ApiOperation({
+    summary: 'LOGOUT',
+    description:
+      'Private endpoint acknowledging logout. Stateless JWT — the client discards the token.',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @HttpCode(HttpStatus.OK)
+  @Auth()
+  logout() {
+    return { message: 'Logged out' };
   }
 
   @Get('refresh-token')

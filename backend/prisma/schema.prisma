@@ -103,3 +103,11 @@ model Reservation {
   @@index([userId])
   @@index([status])
 }
+
+// Key/value store for admin-editable service settings (masked in the API).
+model SystemSetting {
+  key       String   @id
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

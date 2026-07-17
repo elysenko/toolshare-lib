@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
@@ -141,17 +141,17 @@ describe('AuthService', () => {
       expect(result.token).toBe('mock-token');
     });
 
-    it('should throw BadRequestException if credentials are invalid', async () => {
+    it('should throw UnauthorizedException if credentials are invalid', async () => {
       prisma.user.findUniqueOrThrow.mockRejectedValue(new Error());
 
-      await expect(authService.loginUser(email, password)).rejects.toThrow(BadRequestException);
+      await expect(authService.loginUser(email, password)).rejects.toThrow(UnauthorizedException);
     });
 
-    it('should throw BadRequestException if password is incorrect', async () => {
+    it('should throw UnauthorizedException if password is incorrect', async () => {
       prisma.user.findUniqueOrThrow.mockResolvedValue(mockUser);
       bcrypt.compare.mockResolvedValue(false);
 
-      await expect(authService.loginUser(email, password)).rejects.toThrow(BadRequestException);
+      await expect(authService.loginUser(email, password)).rejects.toThrow(UnauthorizedException);
     });
   });
 

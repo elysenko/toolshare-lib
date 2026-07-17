@@ -11,6 +11,21 @@ export class HealthController {
     private prisma: PrismaService
   ) {}
 
+  @Get()
+  @Public()
+  root() {
+    return { status: 'ok' };
+  }
+
+  @Get('deep')
+  @Public()
+  @HealthCheck()
+  deep() {
+    return this.health.check([
+      () => this.prismaHealth.pingCheck('database', this.prisma),
+    ]);
+  }
+
   @Get('live')
   @Public()
   liveness() {

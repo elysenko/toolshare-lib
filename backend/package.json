@@ -3,6 +3,13 @@
   "prisma": {
     "seed": "node prisma/seed/seed.js"
   },
+  "pnpm": {
+    "overrides": {
+      "ajv@<8.18.0": ">=8.18.0",
+      "hono@<4.11.7": ">=4.11.7",
+      "lodash@>=4.0.0 <=4.17.22": ">=4.17.23"
+    }
+  },
   "version": "0.0.1",
   "description": "Sample API for NestJS + Prisma + Postgres with Auth options",
   "author": "{jc-develop}",
