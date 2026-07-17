@@ -39,7 +39,8 @@ export async function bootstrap() {
 
   // End Swagger Configurations --------------------------------
 
-  await app.listen(3000);
-  Logger.log(`App running on Port 3000`);
+  const port = Number(process.env.PORT ?? 3000);
+  await app.listen(port);
+  Logger.log(`App running on Port ${port}`);
 }
 bootstrap();

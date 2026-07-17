@@ -22,4 +22,4 @@ COPY package*.json ./
 EXPOSE 3000
 # Apply pending migrations, run the idempotent seed, then start the API. If a
 # migration fails the container exits non-zero and K8s will not serve traffic.
-CMD ["sh", "-c", "npx prisma migrate deploy && node prisma/seed/seed.js && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node prisma/seed/seed.js && node dist/src/main"]

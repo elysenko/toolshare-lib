@@ -1,0 +1,7 @@
+/dist
+/node_modules
+/.angular
+/tmp
+/out-tsc
+*.log
+.DS_Store

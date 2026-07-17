@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.8.0",
-  "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
+  "clientVersion": "7.4.0",
+  "engineVersion": "ab56fe763f921d033a6c195e7ddeb3e255bdbb57",
   "activeProvider": "postgresql",
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n  // moduleFormat = \"esm\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum Role {\n  admin\n  user\n}\n\nmodel User {\n  id            String        @id @default(uuid())\n  name          String\n  email         String        @unique\n  emailVerified DateTime?\n  password      String\n  role          Role          @default(user)\n  image         String?\n  createdAt     DateTime      @default(now())\n  updatedAt     DateTime      @updatedAt\n  //Relations and Indexes\n  loans         Loan[]        @relation(\"BorrowerLoans\")\n  reservations  Reservation[]\n}\n\n// ── ToolShare domain ──────────────────────────────────────────────────────────\n\nenum ToolCategory {\n  Power\n  Hand\n  Garden\n  Measurement\n}\n\nenum ToolCondition {\n  New\n  Good\n  Fair\n  Worn\n}\n\nenum ReservationStatus {\n  ACTIVE\n  FULFILLED\n  CANCELLED\n}\n\nmodel Tool {\n  id           String        @id @default(uuid())\n  name         String\n  category     ToolCategory\n  condition    ToolCondition\n  createdAt    DateTime      @default(now())\n  updatedAt    DateTime      @updatedAt\n  //Relations and Indexes\n  loans        Loan[]\n  reservations Reservation[]\n\n  @@index([category])\n}\n\nmodel Loan {\n  id             String    @id @default(uuid())\n  toolId         String\n  borrowerName   String\n  borrowerUserId String?\n  dueDate        DateTime\n  returnedAt     DateTime?\n  createdAt      DateTime  @default(now())\n  updatedAt      DateTime  @updatedAt\n  //Relations and Indexes\n  tool           Tool      @relation(fields: [toolId], references: [id], onDelete: Cascade)\n  borrower       User?     @relation(\"BorrowerLoans\", fields: [borrowerUserId], references: [id], onDelete: SetNull)\n\n  @@index([toolId])\n  @@index([returnedAt])\n}\n\nmodel Reservation {\n  id        String            @id @default(uuid())\n  toolId    String\n  userId    String\n  status    ReservationStatus @default(ACTIVE)\n  createdAt DateTime          @default(now())\n  updatedAt DateTime          @updatedAt\n  //Relations and Indexes\n  tool      Tool              @relation(fields: [toolId], references: [id], onDelete: Cascade)\n  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@index([toolId])\n  @@index([userId])\n  @@index([status])\n}\n\n// Key/value store for admin-editable service settings (masked in the API).\nmodel SystemSetting {\n  key       String   @id\n  value     String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
   "runtimeDataModel": {
@@ -67,9 +67,7 @@ export interface PrismaClientConstructor {
    * Type-safe database client for TypeScript
    * @example
    * ```
-   * const prisma = new PrismaClient({
-   *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
-   * })
+   * const prisma = new PrismaClient()
    * // Fetch zero or more Users
    * const users = await prisma.user.findMany()
    * ```
@@ -91,9 +89,7 @@ export interface PrismaClientConstructor {
  * Type-safe database client for TypeScript
  * @example
  * ```
- * const prisma = new PrismaClient({
- *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
- * })
+ * const prisma = new PrismaClient()
  * // Fetch zero or more Users
  * const users = await prisma.user.findMany()
  * ```
@@ -178,9 +174,9 @@ export interface PrismaClient<
    * ])
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
    */
-  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
+  $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => runtime.Types.Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): runtime.Types.Utils.JsPromise<R>
 

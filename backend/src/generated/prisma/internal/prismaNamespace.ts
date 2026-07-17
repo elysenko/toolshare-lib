@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.8.0
- * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
+ * Prisma Client JS version: 7.4.0
+ * Query Engine version: ab56fe763f921d033a6c195e7ddeb3e255bdbb57
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.8.0",
-  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
+  client: "7.4.0",
+  engine: "ab56fe763f921d033a6c195e7ddeb3e255bdbb57"
 }
 
 /**
@@ -1100,21 +1100,6 @@ export type PrismaClientOptions = ({
    * ```
    */
   comments?: runtime.SqlCommenterPlugin[]
-  /**
-   * Optional maximum size for the query plan cache. If not provided, a default size will be used.
-   * A value of `0` can be used to disable the cache entirely. A higher cache size can improve
-   * performance for applications that execute a large number of unique queries, while a smaller
-   * cache size can reduce memory usage.
-   * 
-   * @example
-   * ```
-   * const prisma = new PrismaClient({
-   *   adapter,
-   *   queryPlanCacheMaxSize: 100,
-   * })
-   * ```
-   */
-  queryPlanCacheMaxSize?: number
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit

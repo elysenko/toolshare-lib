@@ -179,7 +179,7 @@ export type LoanGroupByOutputType = {
   _max: LoanMaxAggregateOutputType | null
 }
 
-export type GetLoanGroupByPayload<T extends LoanGroupByArgs> = Prisma.PrismaPromise<
+type GetLoanGroupByPayload<T extends LoanGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LoanGroupByOutputType, T['by']> &
       {
@@ -1365,11 +1365,6 @@ export type LoanFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Loans.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of Loans.
-   */
   distinct?: Prisma.LoanScalarFieldEnum | Prisma.LoanScalarFieldEnum[]
 }
 

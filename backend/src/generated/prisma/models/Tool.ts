@@ -165,7 +165,7 @@ export type ToolGroupByOutputType = {
   _max: ToolMaxAggregateOutputType | null
 }
 
-export type GetToolGroupByPayload<T extends ToolGroupByArgs> = Prisma.PrismaPromise<
+type GetToolGroupByPayload<T extends ToolGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ToolGroupByOutputType, T['by']> &
       {
@@ -1222,11 +1222,6 @@ export type ToolFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Skip the first `n` Tools.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of Tools.
-   */
   distinct?: Prisma.ToolScalarFieldEnum | Prisma.ToolScalarFieldEnum[]
 }
 

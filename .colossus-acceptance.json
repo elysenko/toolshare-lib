@@ -1,0 +1,5 @@
+{
+  "ready_testid": "app-ready",
+  "expect_text": ["toolshare", "welcome back", "sign in to browse tools"],
+  "reject_signatures": ["home-title\">Users<", "Loading...", "Welcome to Angular", "Coming soon"]
+}
